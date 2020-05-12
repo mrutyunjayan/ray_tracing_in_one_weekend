@@ -1,5 +1,5 @@
 mod lib;
-use lib::{color::*, ray::*, vec3::*};
+use lib::{color::*, hittable::*, hittable_list::*, ray::*, rt_math::*, sphere::*, vec3::*};
 
 #[allow(dead_code)]
 fn write_ppm(image_width: usize, image_height: usize) {
@@ -20,11 +20,11 @@ fn write_ppm(image_width: usize, image_height: usize) {
     eprintln!("\nDone\n");
 }
 
-fn ray_color(ray: &Ray) -> Color {
-    let t = hit_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, &ray);
-    if t > 0.0 {
-        let n = Vec3::unit_vector(&(ray.at(t) - Vec3::new(0.0, 0.0, -1.0)));
-        return 0.5 * Color::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
+fn ray_color(ray: &Ray, world: &dyn Hittable) -> Color {
+    let mut hit_rec = HitRecord::new_invalid();
+
+    if world.hit(ray, 0.0, INFINITY, &mut hit_rec) {
+        return 0.5 * (hit_rec.normal_to_color() + Color::new(1.0, 1.0, 1.0));
     }
 
     let unit_direction: Vec3 = Vec3::unit_vector(&ray.direction());
@@ -46,6 +46,11 @@ fn render(image_width: usize, image_height: usize) {
     let lower_left_corner: Point3 =
         origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, 1.0);
 
+    let mut world: HittableList = HittableList::new();
+
+    world.add(Sphere::new_hittable(Point3::new(0.0, 0.0, -1.0), 0.5));
+    world.add(Sphere::new_hittable(Point3::new(0.0, -100.5, -1.0), 100.0));
+
     for j in (0..image_height).rev() {
         eprintln!("\rScanlines remaining: {}", j);
         for i in 0..image_width {
@@ -53,13 +58,14 @@ fn render(image_width: usize, image_height: usize) {
             let v = j as f64 / image_height as f64;
             let r = Ray::new(origin, lower_left_corner + u * horizontal + v * vertical);
 
-            let pixel_color = ray_color(&r);
+            let pixel_color = ray_color(&r, &world);
             Color::write_color(pixel_color);
         }
     }
     eprintln!("\nDone\n");
 }
 
+/*
 fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> f64 {
     // t^2b⋅b + 2tb⋅(A−C) + (A−C)⋅(A−C) − r^2 = 0
 
@@ -75,6 +81,7 @@ fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> f64 {
         (-half_b - discriminant.sqrt()) / (a) //Simplified formula because b = 2h
     }
 }
+*/
 
 fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;

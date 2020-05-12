@@ -1,3 +1,4 @@
+use crate::lib::color::*;
 use crate::lib::ray::Ray;
 use crate::lib::vec3::*;
 
@@ -51,10 +52,14 @@ impl HitRecord {
             self.normal = -*outward_normal;
         }
     }
+
+    pub fn normal_to_color(&self) -> Color {
+        Color::new(self.normal.x(), self.normal.y(), self.normal.z())
+    }
 }
 #[allow(unused_variables)]
 pub trait Hittable {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, hit_rec: &mut HitRecord) -> bool{
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, hit_rec: &mut HitRecord) -> bool {
         false
     }
 }

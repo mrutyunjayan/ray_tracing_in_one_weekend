@@ -1,14 +1,18 @@
 use crate::lib::{hittable::*, ray::Ray, vec3::*};
+use std::rc::Rc;
 
-struct Sphere {
+pub struct Sphere {
     center: Point3,
     radius: f64,
 }
 
 #[allow(dead_code)]
 impl Sphere {
-    fn new(center: Point3, radius: f64) -> Self {
+    pub fn new(center: Point3, radius: f64) -> Self {
         Self { center, radius }
+    }
+    pub fn new_hittable(center: Point3, radius: f64) -> Rc<dyn Hittable> {
+        Rc::new(Self { center, radius })
     }
 }
 
