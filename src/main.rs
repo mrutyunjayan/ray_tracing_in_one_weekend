@@ -23,8 +23,10 @@ fn write_ppm(image_width: usize, image_height: usize) {
 }
 
 fn ray_color(ray: &Ray) -> Color {
-    if hit_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, &ray) {
-        return Color::new(1.0, 0.0, 0.0);
+    let t = hit_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, &ray);
+    if t > 0.0 {
+        let n = Vec3::unit_vector(&(ray.at(t) - Vec3::new(0.0, 0.0, -1.0)));
+        return 0.5 * Color::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
     }
 
     let unit_direction: Vec3 = Vec3::unit_vector(&ray.direction());
@@ -60,21 +62,25 @@ fn render(image_width: usize, image_height: usize) {
     eprintln!("\nDone\n");
 }
 
-fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> bool {
+fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> f64 {
     // t^2b⋅b + 2tb⋅(A−C) + (A−C)⋅(A−C) − r^2 = 0
 
     let oc: Vec3 = r.origin() - *center; // (A-C)
-    let a = &r.direction().dot(&r.direction()); // b.b
-    let b = 2.0 * &oc.dot(&r.direction()); // (A-C)⋅b
-    let c = &oc.dot(&oc) - radius * radius; // (A-C)⋅(A-C)
-    let discriminant = b * b - 4.0 * a * c;
+    let a = &r.direction().length_squared(); // b.b = |b⋅b|^2
+    let half_b = &oc.dot(&r.direction()); // (A-C)⋅b
+    let c = &oc.length_squared() - radius * radius; // (A-C)⋅(A-C) = |A⋅C|^2
+    let discriminant = half_b * half_b - *a * c;
 
-    discriminant > 0.0
+    if discriminant < 0.0 {
+        -1.0
+    } else {
+        (-half_b - discriminant.sqrt()) / (a) //Simplified formula because b = 2h
+    }
 }
 
 fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_WIDTH: usize = 384;
+    const IMAGE_WIDTH: usize = 1920;
     const IMAGE_HEIGHT: usize = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as usize;
 
     render(IMAGE_WIDTH, IMAGE_HEIGHT);
