@@ -1,4 +1,4 @@
-use super::vec3::*;
+use crate::lib::vec3::*;
 #[derive(Copy, Clone)]
 pub struct Ray {
     orig: Point3,

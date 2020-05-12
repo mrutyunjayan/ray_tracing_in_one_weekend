@@ -1,7 +1,5 @@
 mod lib;
-use lib::color::*;
-use lib::ray::*;
-use lib::vec3::*;
+use lib::{color::*, ray::*, vec3::*};
 
 #[allow(dead_code)]
 fn write_ppm(image_width: usize, image_height: usize) {
