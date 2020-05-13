@@ -2,7 +2,7 @@ use crate::lib::color::*;
 use crate::lib::ray::Ray;
 use crate::lib::vec3::*;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct HitRecord {
     p: Point3,
     normal: Vec3,
@@ -12,16 +12,6 @@ pub struct HitRecord {
 
 #[allow(dead_code)]
 impl HitRecord {
-    //create am invalid hit record
-    pub fn new_invalid() -> Self {
-        Self {
-            p: Point3::new(-1.0, -1.0, -1.0),
-            normal: Vec3::new(-1.0, -1.0, -1.0),
-            t: -1.0,
-            front_face: false,
-        }
-    }
-
     pub fn p(&self) -> Point3 {
         self.p
     }
