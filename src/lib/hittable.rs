@@ -2,7 +2,7 @@ use crate::lib::color::*;
 use crate::lib::ray::Ray;
 use crate::lib::vec3::*;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct HitRecord {
     p: Point3,
     normal: Vec3,

@@ -1,7 +1,7 @@
 use super::vec3::*;
 use std::ops;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct Color {
     r: f64,
     g: f64,
@@ -24,12 +24,13 @@ impl Color {
     }
 
     //Write the tranlated [0,255] value of each color component
-    pub fn write_color(pixel_color: Color) {
+    pub fn write_color(pixel_color: Color, samples_per_pixel: usize) {
+
         println!(
             "{} {} {}\n",
-            (255.99 * pixel_color.r) as usize,
-            (255.99 * pixel_color.g) as usize,
-            (255.99 * pixel_color.b) as usize
+            (255.99 * pixel_color.r) as usize / samples_per_pixel,
+            (255.99 * pixel_color.g) as usize / samples_per_pixel,
+            (255.99 * pixel_color.b) as usize / samples_per_pixel
         )
     }
 }
