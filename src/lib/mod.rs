@@ -1,8 +1,9 @@
-pub mod vec3;
-pub mod color;
-pub mod ray;
-pub mod hittable;
-pub mod sphere;
-pub mod hittable_list;
-pub mod rt_math;
 pub mod camera;
+pub mod color;
+pub mod hittable;
+pub mod hittable_list;
+pub mod material;
+pub mod ray;
+pub mod rt_math;
+pub mod sphere;
+pub mod vec3;

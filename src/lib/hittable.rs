@@ -1,11 +1,11 @@
-use crate::lib::color::*;
-use crate::lib::ray::Ray;
-use crate::lib::vec3::*;
+use crate::lib::{color::*, material::Material, ray::Ray, vec3::*};
+use std::rc::Rc;
 
 #[derive(Copy, Clone, Default)]
 pub struct HitRecord {
     point: Point3,
     normal: Vec3,
+    material_ptr: Box<dyn Material>,
     t: f64,
     front_face: bool,
 }
@@ -17,6 +17,7 @@ impl HitRecord {
         Self {
             point: Point3::new(-1.0, -1.0, -1.0),
             normal: Vec3::new(-1.0, -1.0, -1.0),
+            material_ptr: ,
             t: -1.0,
             front_face: false,
         }
