@@ -14,7 +14,7 @@ fn ray_color(ray: &Ray, world: &dyn Hittable, depth: u16) -> Color {
     }
 
     if world.hit(ray, 0.001, INFINITY as f64, &mut hit_rec) {
-        let target = hit_rec.point() + hit_rec.normal() + Vec3::random_in_unit_sphere();
+        let target = hit_rec.point() + hit_rec.normal() + Vec3::random_unit_vector_lambertian();
         let temp_ray = Ray::new(hit_rec.point(), target - hit_rec.point());
         return 0.5 * ray_color(&temp_ray, world, depth - 1);
         //return 0.5 * (hit_rec.normal_to_color() + Color::new(1.0, 1.0, 1.0));
