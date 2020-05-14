@@ -9,7 +9,10 @@ fn ray_color(ray: &Ray, world: &dyn Hittable) -> Color {
     let mut hit_rec = HitRecord::new_invalid();
 
     if world.hit(ray, 0.0, INFINITY as f64, &mut hit_rec) {
-        return 0.5 * (hit_rec.normal_to_color() + Color::new(1.0, 1.0, 1.0));
+        let target = hit_rec.point() + hit_rec.normal() + Vec3::random_in_unit_sphere();
+        let temp_ray = Ray::new(hit_rec.point(), target - hit_rec.point());
+        return 0.5 * ray_color(&temp_ray, world);
+        //return 0.5 * (hit_rec.normal_to_color() + Color::new(1.0, 1.0, 1.0));
     }
 
     let unit_direction: Vec3 = Vec3::unit_vector(&ray.direction());
@@ -59,7 +62,7 @@ fn render(image_width: usize, image_height: usize, samples_per_pixel: usize) {
 
 fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_HEIGHT: usize = 360;
+    const IMAGE_HEIGHT: usize = 144;
     const IMAGE_WIDTH: usize = (IMAGE_HEIGHT as f64 * ASPECT_RATIO) as usize;
     const SAMPLE_PER_PIXEL: usize = 100;
 

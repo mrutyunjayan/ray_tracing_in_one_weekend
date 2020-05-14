@@ -4,7 +4,7 @@ use crate::lib::vec3::*;
 
 #[derive(Copy, Clone, Default)]
 pub struct HitRecord {
-    p: Point3,
+    point: Point3,
     normal: Vec3,
     t: f64,
     front_face: bool,
@@ -15,15 +15,15 @@ impl HitRecord {
     //create am invalid hit record
     pub fn new_invalid() -> Self {
         Self {
-            p: Point3::new(-1.0, -1.0, -1.0),
+            point: Point3::new(-1.0, -1.0, -1.0),
             normal: Vec3::new(-1.0, -1.0, -1.0),
             t: -1.0,
             front_face: false,
         }
     }
 
-    pub fn p(&self) -> Point3 {
-        self.p
+    pub fn point(&self) -> Point3 {
+        self.point
     }
 
     pub fn normal(&self) -> Vec3 {
@@ -34,8 +34,8 @@ impl HitRecord {
         self.t
     }
 
-    pub fn set_p(&mut self, p: Point3) {
-        self.p = p;
+    pub fn set_p(&mut self, point: Point3) {
+        self.point = point;
     }
 
     pub fn set_t(&mut self, t: f64) {

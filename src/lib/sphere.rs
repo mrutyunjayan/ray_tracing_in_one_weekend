@@ -35,7 +35,7 @@ impl Hittable for Sphere {
             if temp < t_max && temp > t_min {
                 hit_rec.set_t(temp);
                 hit_rec.set_p(ray.at(hit_rec.t()));
-                let outward_normal = (hit_rec.p() - self.center) / self.radius;
+                let outward_normal = (hit_rec.point() - self.center) / self.radius;
                 hit_rec.set_face_normal(ray, &outward_normal);
                 return true;
             }
@@ -44,7 +44,7 @@ impl Hittable for Sphere {
             if temp < t_max && temp > t_min {
                 hit_rec.set_t(temp);
                 hit_rec.set_p(ray.at(hit_rec.t()));
-                let outward_normal = (hit_rec.p() - self.center) / self.radius;
+                let outward_normal = (hit_rec.point() - self.center) / self.radius;
                 hit_rec.set_face_normal(ray, &outward_normal);
                 return true;
             }

@@ -1,5 +1,7 @@
 use std::ops;
 
+use rand::prelude::*;
+
 pub type Point3 = Vec3;
 
 #[derive(Copy, Clone, Debug, PartialEq, Default)]
@@ -45,6 +47,26 @@ impl Vec3 {
     }
     pub fn z(&self) -> f64 {
         self.z
+    }
+
+    pub fn random() -> Self {
+        let mut rng = rand::thread_rng();
+
+        Self {
+            x: rng.gen::<f64>(),
+            y: rng.gen::<f64>(),
+            z: rng.gen::<f64>(),
+        }
+    }
+
+    pub fn random_in_unit_sphere() -> Vec3 {
+        loop {
+            let p = Vec3::random();
+            if p.length_squared() >= 1.0 {
+                continue;
+            }
+            return p;
+        }
     }
 }
 
