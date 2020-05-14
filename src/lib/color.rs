@@ -1,4 +1,4 @@
-use crate::lib::{rt_math::*, vec3::*};
+use super::vec3::*;
 use std::ops;
 
 #[derive(Copy, Clone, Default)]
@@ -24,31 +24,14 @@ impl Color {
     }
 
     //Write the tranlated [0,255] value of each color component
-    pub fn write_color(pixel_color: &Color, samples_per_pixel: f64) {
-        /*
-        let mut r = pixel_color.r;
-        let mut g = pixel_color.g;
-        let mut b = pixel_color.b;
+    pub fn write_color(pixel_color: Color, samples_per_pixel: usize) {
 
-        //Divide the color total by the number of samples
-        let scale = 1.0 / samples_per_pixel;
-        r *= scale;
-        g *= scale;
-        b *= scale;
-
-        //write the translated [0, 255] value of each compnonent
         println!(
             "{} {} {}\n",
-            (256.0 * clamp(r, 0.0, 0.999)) as usize,
-            (256.0 * clamp(g, 0.0, 0.999)) as usize,
-            (256.0 * clamp(b, 0.0, 0.999)) as usize
+            (255.99 * pixel_color.r) as usize / samples_per_pixel,
+            (255.99 * pixel_color.g) as usize / samples_per_pixel,
+            (255.99 * pixel_color.b) as usize / samples_per_pixel
         )
-        */
-        let ir = (255.99 * pixel_color.r() / samples_per_pixel) as usize;
-        let ig = (255.99 * pixel_color.g() / samples_per_pixel) as usize;
-        let ib = (255.99 * pixel_color.b() / samples_per_pixel) as usize;
-
-        println!("{} {} {}\n", ir, ig, ib)
     }
 }
 
@@ -135,25 +118,5 @@ impl ops::Mul<Color> for f64 {
             g: (self * rhs.g),
             b: (self * rhs.b),
         }
-    }
-}
-
-impl ops::Mul<&Color> for f64 {
-    type Output = Color;
-
-    fn mul(self, rhs: &Color) -> Self::Output {
-        Color {
-            r: (self * rhs.r),
-            g: (self * rhs.g),
-            b: (self * rhs.b),
-        }
-    }
-}
-
-impl ops::AddAssign for Color {
-    fn add_assign(&mut self, rhs: Color) {
-        self.r += rhs.r();
-        self.g += rhs.g();
-        self.b += rhs.b();
     }
 }

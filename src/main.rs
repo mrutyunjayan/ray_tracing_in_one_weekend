@@ -1,17 +1,14 @@
 mod lib;
-
 use lib::{
     camera::*, color::*, hittable::*, hittable_list::*, ray::*, rt_math::*, sphere::*, vec3::*,
 };
 
 use rand::prelude::*;
 
-//look of ray hits something. if it doesn't color the background. if it does, delegate coloring
-//the 'hit()' function
 fn ray_color(ray: &Ray, world: &dyn Hittable) -> Color {
-    let mut hit_rec = HitRecord::default();
+    let mut hit_rec = HitRecord::new_invalid();
 
-    if world.hit(ray, 0.0, INFINITY, &mut hit_rec) {
+    if world.hit(ray, 0.0, INFINITY as f64, &mut hit_rec) {
         return 0.5 * (hit_rec.normal_to_color() + Color::new(1.0, 1.0, 1.0));
     }
 
@@ -20,7 +17,7 @@ fn ray_color(ray: &Ray, world: &dyn Hittable) -> Color {
     let start_value = Color::new(1.0, 1.0, 1.0);
     let end_value = Color::new(0.5, 0.7, 1.0);
 
-    //linear blend for the background
+    //linear blend
     // blendedValue = (1 − t)⋅startValue + t⋅endValue
     (1.0 - t) * start_value + t * end_value
 }
@@ -28,28 +25,33 @@ fn ray_color(ray: &Ray, world: &dyn Hittable) -> Color {
 fn render(image_width: usize, image_height: usize, samples_per_pixel: usize) {
     println!("P3\n{} {} \n255\n", image_width, image_height);
 
+    let mut world: HittableList = HittableList::new();
+
+    world.add(Sphere::new_hittable(Point3::new(0.0, 0.0, -1.0), 0.5));
+    world.add(Sphere::new_hittable(Point3::new(0.0, -100.5, -1.0), 100.0));
+
     let cam = Camera::default();
-    let mut world = HittableList::new();
 
-    world.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5));
-    world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
-
-    //random number generator
     let mut rng = rand::thread_rng();
 
+    //vertical lines
     for j in (0..image_height).rev() {
         eprintln!("\rScanlines remaining: {}", j);
 
+        //horizontal lines
         for i in 0..image_width {
             let mut pixel_color = Color::default();
 
+            //sampling each pixel multiple times for anti-aliasing
             for _ in 0..samples_per_pixel {
-                let u = ((i + rng.gen::<usize>()) / (image_width - 1)) as f64;
-                let v = ((j + rng.gen::<usize>()) / (image_width - 1)) as f64;
-                let ray = &cam.get_ray(u, v);
-                pixel_color += ray_color(ray, &world);
+                let u = (i as f64 + rng.gen::<f64>()) / image_width as f64;
+                let v = (j as f64) / image_height as f64;
+
+                let ray = &cam.get_ray(u, v); //Ray::new(origin, lower_left_corner + u * horizontal + v * vertical);
+                pixel_color = pixel_color + ray_color(ray, &world);
             }
-            Color::write_color(&pixel_color, samples_per_pixel as f64);
+
+            Color::write_color(pixel_color, samples_per_pixel);
         }
     }
     eprintln!("\nDone\n");
@@ -57,12 +59,11 @@ fn render(image_width: usize, image_height: usize, samples_per_pixel: usize) {
 
 fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_WIDTH: usize = 200;
-    const IMAGE_HEIGHT: usize = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as usize;
-    const SAMPLES_PER_PIXEL: usize = 100;
+    const IMAGE_HEIGHT: usize = 360;
+    const IMAGE_WIDTH: usize = (IMAGE_HEIGHT as f64 * ASPECT_RATIO) as usize;
+    const SAMPLE_PER_PIXEL: usize = 100;
 
-    render(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLES_PER_PIXEL);
-
+    render(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLE_PER_PIXEL);
     eprintln!(
         "Rendered image with dimensions:\n {} x {}",
         IMAGE_WIDTH, IMAGE_HEIGHT

@@ -1,7 +1,6 @@
 use crate::lib::{hittable::*, ray::Ray};
 use std::rc::Rc;
 
-#[derive(Default)]
 pub struct HittableList {
     objects: Vec<Rc<dyn Hittable>>,
 }
@@ -13,6 +12,7 @@ impl HittableList {
             objects: Vec::new(),
         }
     }
+
     pub fn add(&mut self, object: Rc<dyn Hittable>) {
         self.objects.push(object);
     }
@@ -25,7 +25,7 @@ impl HittableList {
 impl Hittable for HittableList {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, hit_rec: &mut HitRecord) -> bool {
         //initializing temp_hit_rec with a value with the understanding that all implementations of the 'hit()' function will set it's own values for HitReacord instances before reading from them
-        let mut temp_hit_rec = HitRecord::default();
+        let mut temp_hit_rec = HitRecord::new_invalid();
         let mut hit_anything = false;
         let mut closest_so_far = t_max;
 

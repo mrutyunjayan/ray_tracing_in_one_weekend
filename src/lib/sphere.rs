@@ -6,26 +6,29 @@ pub struct Sphere {
     radius: f64,
 }
 
+#[allow(dead_code)]
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Rc<dyn Hittable> {
+    pub fn new(center: Point3, radius: f64) -> Self {
+        Self { center, radius }
+    }
+    pub fn new_hittable(center: Point3, radius: f64) -> Rc<dyn Hittable> {
         Rc::new(Self { center, radius })
     }
 }
 
 impl Hittable for Sphere {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, hit_rec: &mut HitRecord) -> bool {
-        // t^2b⋅b + 2tb⋅(A−C) + (A−C)⋅(A−C) − r^2 = 0
         //define the sphere and the ray interaction
-        let oc: Vec3 = ray.origin() - self.center; // (A-C)
-        let a = &ray.direction().length_squared(); // b.b = |b⋅b|^2
-        let half_b = &oc.dot(&ray.direction()); // (A-C)⋅b
-        let c = &oc.length_squared() - self.radius * self.radius; // (A-C)⋅(A-C) = |A⋅C|^2
-        let discriminant = half_b * half_b - *a * c;
+        let oc: Vec3 = ray.origin() - self.center;
+        let a = ray.direction().length_squared();
+        let half_b = oc.dot(&ray.direction());
+        let c = oc.length_squared() - self.radius * self.radius;
+        let discriminant = half_b * half_b - a * c;
 
         //if the ray hits the sphere
         if discriminant > 0.0 {
             let root = discriminant.sqrt();
-            let mut temp = (-half_b - root) / a; //Simplified formula because b = 2h
+            let mut temp = (-half_b - root) / a;
 
             //if 't' is within the bounds
             //first root
