@@ -48,17 +48,6 @@ impl Vec3 {
     pub fn z(&self) -> f64 {
         self.z
     }
-
-    pub fn random() -> Self {
-        let mut rng = rand::thread_rng();
-
-        Self {
-            x: rng.gen::<f64>(),
-            y: rng.gen::<f64>(),
-            z: rng.gen::<f64>(),
-        }
-    }
-
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
             let p = Vec3::random();
@@ -66,6 +55,15 @@ impl Vec3 {
                 continue;
             }
             return p;
+        }
+    }
+    fn random() -> Self {
+        let mut rng = rand::thread_rng();
+
+        Self {
+            x: rng.gen::<f64>(),
+            y: rng.gen::<f64>(),
+            z: rng.gen::<f64>(),
         }
     }
 }

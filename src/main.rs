@@ -13,7 +13,7 @@ fn ray_color(ray: &Ray, world: &dyn Hittable, depth: u16) -> Color {
         return Color::new(0.0, 0.0, 0.0);
     }
 
-    if world.hit(ray, 0.0, INFINITY as f64, &mut hit_rec) {
+    if world.hit(ray, 0.001, INFINITY as f64, &mut hit_rec) {
         let target = hit_rec.point() + hit_rec.normal() + Vec3::random_in_unit_sphere();
         let temp_ray = Ray::new(hit_rec.point(), target - hit_rec.point());
         return 0.5 * ray_color(&temp_ray, world, depth - 1);
@@ -53,13 +53,20 @@ fn render(image_width: usize, image_height: usize, samples_per_pixel: usize, max
             //sampling each pixel multiple times for anti-aliasing
             for _ in 0..samples_per_pixel {
                 let u = (i as f64 + rng.gen::<f64>()) / image_width as f64;
-                let v = (j as f64) / image_height as f64;
+                let v = (j as f64 + rng.gen::<f64>()) / image_height as f64;
 
                 let ray = &cam.get_ray(u, v); //Ray::new(origin, lower_left_corner + u * horizontal + v * vertical);
                 pixel_color = pixel_color + ray_color(ray, &world, max_depth);
             }
 
-            Color::write_color(pixel_color, samples_per_pixel);
+            pixel_color = pixel_color / (samples_per_pixel as f64);
+            //sqrt to correct gamma (gamma = 2.0)
+            pixel_color = Color::new(
+                pixel_color.r().sqrt(),
+                pixel_color.g().sqrt(),
+                pixel_color.b().sqrt(),
+            );
+            Color::write_color(&pixel_color);
         }
     }
     eprintln!("\nDone\n");
