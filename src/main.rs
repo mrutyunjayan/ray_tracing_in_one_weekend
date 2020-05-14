@@ -5,11 +5,19 @@ use lib::{
 
 use rand::prelude::*;
 
-fn ray_color(ray: &Ray, world: &dyn Hittable) -> Color {
+fn ray_color(ray: &Ray, world: &dyn Hittable, depth: u16) -> Color {
     let mut hit_rec = HitRecord::new_invalid();
 
-    if world.hit(ray, 0.0, INFINITY as f64, &mut hit_rec) {
-        return 0.5 * (hit_rec.normal_to_color() + Color::new(1.0, 1.0, 1.0));
+    //if we've exceeded the ray bounce limit, no more light is gathered
+    if depth <= 0 {
+        return Color::new(0.0, 0.0, 0.0);
+    }
+
+    if world.hit(ray, 0.001, INFINITY as f64, &mut hit_rec) {
+        let target = hit_rec.point() + hit_rec.normal() + Vec3::random_unit_vector_lambertian();
+        let temp_ray = Ray::new(hit_rec.point(), target - hit_rec.point());
+        return 0.5 * ray_color(&temp_ray, world, depth - 1);
+        //return 0.5 * (hit_rec.normal_to_color() + Color::new(1.0, 1.0, 1.0));
     }
 
     let unit_direction: Vec3 = Vec3::unit_vector(&ray.direction());
@@ -22,7 +30,7 @@ fn ray_color(ray: &Ray, world: &dyn Hittable) -> Color {
     (1.0 - t) * start_value + t * end_value
 }
 
-fn render(image_width: usize, image_height: usize, samples_per_pixel: usize) {
+fn render(image_width: usize, image_height: usize, samples_per_pixel: usize, max_depth: u16) {
     println!("P3\n{} {} \n255\n", image_width, image_height);
 
     let mut world: HittableList = HittableList::new();
@@ -45,13 +53,20 @@ fn render(image_width: usize, image_height: usize, samples_per_pixel: usize) {
             //sampling each pixel multiple times for anti-aliasing
             for _ in 0..samples_per_pixel {
                 let u = (i as f64 + rng.gen::<f64>()) / image_width as f64;
-                let v = (j as f64) / image_height as f64;
+                let v = (j as f64 + rng.gen::<f64>()) / image_height as f64;
 
                 let ray = &cam.get_ray(u, v); //Ray::new(origin, lower_left_corner + u * horizontal + v * vertical);
-                pixel_color = pixel_color + ray_color(ray, &world);
+                pixel_color = pixel_color + ray_color(ray, &world, max_depth);
             }
 
-            Color::write_color(pixel_color, samples_per_pixel);
+            pixel_color = pixel_color / (samples_per_pixel as f64);
+            //sqrt to correct gamma (gamma = 2.0)
+            pixel_color = Color::new(
+                pixel_color.r().sqrt(),
+                pixel_color.g().sqrt(),
+                pixel_color.b().sqrt(),
+            );
+            Color::write_color(&pixel_color);
         }
     }
     eprintln!("\nDone\n");
@@ -62,8 +77,9 @@ fn main() {
     const IMAGE_HEIGHT: usize = 360;
     const IMAGE_WIDTH: usize = (IMAGE_HEIGHT as f64 * ASPECT_RATIO) as usize;
     const SAMPLE_PER_PIXEL: usize = 100;
+    const MAX_DEPTH: u16 = 50;
 
-    render(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLE_PER_PIXEL);
+    render(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLE_PER_PIXEL, MAX_DEPTH);
     eprintln!(
         "Rendered image with dimensions:\n {} x {}",
         IMAGE_WIDTH, IMAGE_HEIGHT

@@ -1,5 +1,9 @@
 use std::ops;
 
+use crate::lib::rt_math::PI;
+
+use rand::prelude::*;
+
 pub type Point3 = Vec3;
 
 #[derive(Copy, Clone, Debug, PartialEq, Default)]
@@ -45,6 +49,35 @@ impl Vec3 {
     }
     pub fn z(&self) -> f64 {
         self.z
+    }
+    pub fn random_in_unit_sphere() -> Vec3 {
+        loop {
+            let p = Vec3::random();
+            if p.length_squared() >= 1.0 {
+                continue;
+            }
+            return p;
+        }
+    }
+
+    pub fn random_unit_vector_lambertian() -> Vec3 {
+        let mut rng = rand::thread_rng();
+
+        let a = rng.gen::<f64>() * PI; //random value between 0.0 and PI
+        let z = rng.gen::<f64>() * 2.0 - 1.0; //random value between -1.0 and 1.0
+        let r = (1.0 - z * z).sqrt();
+
+        return Vec3::new(r * a.cos(), r * a.sin(), z);
+    }
+
+    fn random() -> Self {
+        let mut rng = rand::thread_rng();
+
+        Self {
+            x: rng.gen::<f64>(),
+            y: rng.gen::<f64>(),
+            z: rng.gen::<f64>(),
+        }
     }
 }
 

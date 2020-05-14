@@ -24,13 +24,12 @@ impl Color {
     }
 
     //Write the tranlated [0,255] value of each color component
-    pub fn write_color(pixel_color: Color, samples_per_pixel: usize) {
-
+    pub fn write_color(pixel_color: &Color) {
         println!(
             "{} {} {}\n",
-            (255.99 * pixel_color.r) as usize / samples_per_pixel,
-            (255.99 * pixel_color.g) as usize / samples_per_pixel,
-            (255.99 * pixel_color.b) as usize / samples_per_pixel
+            (255.99 * pixel_color.r) as usize,
+            (255.99 * pixel_color.g) as usize,
+            (255.99 * pixel_color.b) as usize
         )
     }
 }
