@@ -97,6 +97,18 @@ impl ops::Div<f64> for Color {
     }
 }
 
+impl ops::Mul for Color {
+    type Output = Self;
+
+    fn mul(self, rhs: Color) -> Self::Output {
+        Self {
+            r: self.r * rhs.r,
+            g: self.g * rhs.g,
+            b: self.b * rhs.b,
+        }
+    }
+}
+
 impl ops::Mul<f64> for Color {
     type Output = Self;
 

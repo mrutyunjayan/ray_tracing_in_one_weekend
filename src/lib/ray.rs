@@ -1,5 +1,5 @@
 use crate::lib::vec3::*;
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct Ray {
     orig: Point3,
     dir: Vec3,
@@ -7,10 +7,10 @@ pub struct Ray {
 
 #[allow(dead_code)]
 impl Ray {
-    pub fn new(origin: Point3, direction: Point3) -> Self {
+    pub fn new(origin: &Point3, direction: &Point3) -> Self {
         Self {
-            orig: origin,
-            dir: direction,
+            orig: *origin,
+            dir: *direction,
         }
     }
     pub fn origin(&self) -> Point3 {

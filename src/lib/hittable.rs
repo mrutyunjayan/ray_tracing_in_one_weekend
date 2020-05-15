@@ -1,11 +1,9 @@
-use crate::lib::color::*;
-use crate::lib::ray::Ray;
-use crate::lib::vec3::*;
-
+use crate::lib::{color::*, material::Material, ray::Ray, vec3::*};
 #[derive(Copy, Clone, Default)]
 pub struct HitRecord {
     point: Point3,
     normal: Vec3,
+    material: Material,
     t: f64,
     front_face: bool,
 }
@@ -17,6 +15,7 @@ impl HitRecord {
         Self {
             point: Point3::new(-1.0, -1.0, -1.0),
             normal: Vec3::new(-1.0, -1.0, -1.0),
+            material: Material::default(),
             t: -1.0,
             front_face: false,
         }
@@ -30,6 +29,10 @@ impl HitRecord {
         self.normal
     }
 
+    pub fn material(&self) -> Material {
+        self.material
+    }
+
     pub fn t(&self) -> f64 {
         self.t
     }
@@ -40,6 +43,10 @@ impl HitRecord {
 
     pub fn set_t(&mut self, t: f64) {
         self.t = t;
+    }
+
+    pub fn set_material(&mut self, material: Material) {
+        self.material = material;
     }
 
     pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: &Vec3) {
