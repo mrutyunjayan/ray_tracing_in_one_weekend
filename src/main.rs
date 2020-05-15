@@ -1,6 +1,7 @@
 mod lib;
 use lib::{
-    camera::*, color::*, hittable::*, hittable_list::*, ray::*, rt_math::*, sphere::*, vec3::*,
+    camera::*, color::*, hittable::*, hittable_list::*, material::Material, ray::*, rt_math::*,
+    sphere::*, vec3::*,
 };
 
 use rand::prelude::*;
@@ -14,10 +15,25 @@ fn ray_color(ray: &Ray, world: &dyn Hittable, depth: u16) -> Color {
     }
 
     if world.hit(ray, 0.001, INFINITY as f64, &mut hit_rec) {
+        let mut scattered = Ray::default();
+        let mut attenuation = Color::default();
+
+        if Material::scatter(
+            &hit_rec.material(),
+            ray,
+            &hit_rec,
+            &mut attenuation,
+            &mut scattered,
+        ) {
+            return attenuation * ray_color(&scattered, world, depth - 1); //not real vector multiplication - just scaling by the attenuation values
+        }
+        return Color::new(0.0, 0.0, 0.0);
+
+        /*
         let target = hit_rec.point() + hit_rec.normal() + Vec3::random_unit_vector_lambertian();
         let temp_ray = Ray::new(hit_rec.point(), target - hit_rec.point());
         return 0.5 * ray_color(&temp_ray, world, depth - 1);
-        //return 0.5 * (hit_rec.normal_to_color() + Color::new(1.0, 1.0, 1.0));
+        */
     }
 
     let unit_direction: Vec3 = Vec3::unit_vector(&ray.direction());
@@ -35,8 +51,26 @@ fn render(image_width: usize, image_height: usize, samples_per_pixel: usize, max
 
     let mut world: HittableList = HittableList::new();
 
-    world.add(Sphere::new_hittable(Point3::new(0.0, 0.0, -1.0), 0.5));
-    world.add(Sphere::new_hittable(Point3::new(0.0, -100.5, -1.0), 100.0));
+    world.add(Sphere::new_hittable(
+        Point3::new(0.0, 0.0, -1.0),
+        0.5,
+        Material::lambertian(&Color::new(0.7, 0.3, 0.3)),
+    ));
+    world.add(Sphere::new_hittable(
+        Point3::new(0.0, -100.5, -1.0),
+        100.0,
+        Material::lambertian(&Color::new(0.8, 0.8, 0.0)),
+    ));
+    world.add(Sphere::new_hittable(
+        Point3::new(1.0, 0.0, -1.0),
+        0.5,
+        Material::metal(&Color::new(0.8, 0.6, 0.2), 0.3),
+    ));
+    world.add(Sphere::new_hittable(
+        Point3::new(-1.0, 0.0, -1.0),
+        0.5,
+        Material::metal(&Color::new(0.8, 0.8, 0.8), 0.1),
+    ));
 
     let cam = Camera::default();
 
@@ -74,7 +108,7 @@ fn render(image_width: usize, image_height: usize, samples_per_pixel: usize, max
 
 fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_HEIGHT: usize = 360;
+    const IMAGE_HEIGHT: usize = 720;
     const IMAGE_WIDTH: usize = (IMAGE_HEIGHT as f64 * ASPECT_RATIO) as usize;
     const SAMPLE_PER_PIXEL: usize = 100;
     const MAX_DEPTH: u16 = 50;

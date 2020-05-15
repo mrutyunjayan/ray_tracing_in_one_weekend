@@ -79,6 +79,10 @@ impl Vec3 {
             z: rng.gen::<f64>(),
         }
     }
+
+    pub fn reflect(&self, normal: &Vec3) -> Self {
+        *self - 2.0 * self.dot(normal) * *normal
+    }
 }
 
 #[allow(dead_code)]
