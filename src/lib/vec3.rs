@@ -200,15 +200,15 @@ mod tests {
     use crate::lib::vec3::*;
 
     #[test]
-    fn test_vec3_dot() {
+    fn test_vec3_cross() {
         assert_eq!(
-            Vec3::new(1.0, 2.0, 3.0).cross(&Vec3::new(1.0, 5.0, 7.0)),
-            Vec3::new(-1.0, -4.0, 3.0)
+            Vec3::new(0.0, 1.0, 0.0).cross(&Vec3::new(-2.0, 2.0, 0.0)),
+            Vec3::new(0.0, 0.0, 2.0)
         );
     }
 
     #[test]
-    fn test_vec3_cross() {
+    fn test_vec3_dot() {
         assert_eq!(
             Vec3::new(1.0, 2.0, 3.0).dot(&Vec3::new(1.0, 5.0, 7.0)) as usize,
             32.0 as usize

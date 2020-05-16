@@ -5,6 +5,7 @@ use lib::{
 };
 
 use rand::prelude::*;
+//use std::f64::consts::*;
 
 fn ray_color(ray: &Ray, world: &dyn Hittable, depth: u16) -> Color {
     let mut hit_rec = HitRecord::new_invalid();
@@ -40,9 +41,12 @@ fn ray_color(ray: &Ray, world: &dyn Hittable, depth: u16) -> Color {
     (1.0 - t) * &start_value + t * &end_value
 }
 
-fn render(image_width: usize, image_height: usize, samples_per_pixel: usize, max_depth: u16) {
+fn render(aspect_ratio: f64, image_height: usize, samples_per_pixel: usize, max_depth: u16) {
+    let image_width = (image_height as f64 * aspect_ratio) as usize;
+
     println!("P3\n{} {} \n255\n", image_width, image_height);
 
+    //let r: f64 = (PI / 4.0).cos();
     let mut world: HittableList = HittableList::new();
 
     world.add(Sphere::new_hittable(
@@ -71,7 +75,17 @@ fn render(image_width: usize, image_height: usize, samples_per_pixel: usize, max
         Material::dielectrtic(1.5),
     ));
 
-    let cam = Camera::default();
+    let v_up = Vec3::new(0.0, 1.0, 0.0);
+
+    let cam = Camera::new(
+        &Point3::new(-2.0, 2.0, 1.0),
+        &Point3::new(0.0, 0.0, -1.0),
+        &v_up,
+        90.0,
+        aspect_ratio,
+    );
+
+    //let cam = Camera::default();
 
     let mut rng = rand::thread_rng();
 
@@ -112,7 +126,7 @@ fn main() {
     const SAMPLE_PER_PIXEL: usize = 100;
     const MAX_DEPTH: u16 = 50;
 
-    render(IMAGE_WIDTH, IMAGE_HEIGHT, SAMPLE_PER_PIXEL, MAX_DEPTH);
+    render(ASPECT_RATIO, IMAGE_HEIGHT, SAMPLE_PER_PIXEL, MAX_DEPTH);
     eprintln!(
         "Rendered image with dimensions:\n {} x {}",
         IMAGE_WIDTH, IMAGE_HEIGHT
