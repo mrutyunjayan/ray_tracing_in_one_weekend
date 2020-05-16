@@ -10,7 +10,7 @@ fn ray_color(ray: &Ray, world: &dyn Hittable, depth: u16) -> Color {
     let mut hit_rec = HitRecord::new_invalid();
 
     //if we've exceeded the ray bounce limit, no more light is gathered
-    if depth <= 0 {
+    if depth == 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
 
@@ -25,15 +25,9 @@ fn ray_color(ray: &Ray, world: &dyn Hittable, depth: u16) -> Color {
             &mut attenuation,
             &mut scattered,
         ) {
-            return attenuation * ray_color(&scattered, world, depth - 1); //not real vector multiplication - just scaling by the attenuation values
+            return &attenuation * &ray_color(&scattered, world, depth - 1); //not real vector multiplication - just scaling by the attenuation values
         }
         return Color::new(0.0, 0.0, 0.0);
-
-        /*
-        let target = hit_rec.point() + hit_rec.normal() + Vec3::random_unit_vector_lambertian();
-        let temp_ray = Ray::new(hit_rec.point(), target - hit_rec.point());
-        return 0.5 * ray_color(&temp_ray, world, depth - 1);
-        */
     }
 
     let unit_direction: Vec3 = Vec3::unit_vector(&ray.direction());
@@ -43,7 +37,7 @@ fn ray_color(ray: &Ray, world: &dyn Hittable, depth: u16) -> Color {
 
     //linear blend
     // blendedValue = (1 − t)⋅startValue + t⋅endValue
-    (1.0 - t) * start_value + t * end_value
+    (1.0 - t) * &start_value + t * &end_value
 }
 
 fn render(image_width: usize, image_height: usize, samples_per_pixel: usize, max_depth: u16) {
@@ -54,7 +48,7 @@ fn render(image_width: usize, image_height: usize, samples_per_pixel: usize, max
     world.add(Sphere::new_hittable(
         Point3::new(0.0, 0.0, -1.0),
         0.5,
-        Material::lambertian(&Color::new(0.7, 0.3, 0.3)),
+        Material::lambertian(&Color::new(0.1, 0.2, 0.5)),
     ));
     world.add(Sphere::new_hittable(
         Point3::new(0.0, -100.5, -1.0),
@@ -64,12 +58,17 @@ fn render(image_width: usize, image_height: usize, samples_per_pixel: usize, max
     world.add(Sphere::new_hittable(
         Point3::new(1.0, 0.0, -1.0),
         0.5,
-        Material::metal(&Color::new(0.8, 0.6, 0.2), 0.3),
+        Material::metal(&Color::new(0.8, 0.6, 0.2), 0.0),
     ));
     world.add(Sphere::new_hittable(
         Point3::new(-1.0, 0.0, -1.0),
         0.5,
-        Material::metal(&Color::new(0.8, 0.8, 0.8), 0.1),
+        Material::dielectrtic(1.5),
+    ));
+    world.add(Sphere::new_hittable(
+        Point3::new(-1.0, 0.0, -1.0),
+        -0.45,
+        Material::dielectrtic(1.5),
     ));
 
     let cam = Camera::default();
@@ -93,7 +92,7 @@ fn render(image_width: usize, image_height: usize, samples_per_pixel: usize, max
                 pixel_color = pixel_color + ray_color(ray, &world, max_depth);
             }
 
-            pixel_color = pixel_color / (samples_per_pixel as f64);
+            pixel_color = &pixel_color / (samples_per_pixel as f64);
             //sqrt to correct gamma (gamma = 2.0)
             pixel_color = Color::new(
                 pixel_color.r().sqrt(),
@@ -108,7 +107,7 @@ fn render(image_width: usize, image_height: usize, samples_per_pixel: usize, max
 
 fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_HEIGHT: usize = 720;
+    const IMAGE_HEIGHT: usize = 360;
     const IMAGE_WIDTH: usize = (IMAGE_HEIGHT as f64 * ASPECT_RATIO) as usize;
     const SAMPLE_PER_PIXEL: usize = 100;
     const MAX_DEPTH: u16 = 50;

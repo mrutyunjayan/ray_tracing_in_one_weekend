@@ -1,6 +1,5 @@
+use std::f64::consts::*;
 use std::ops;
-
-use crate::lib::rt_math::PI;
 
 use rand::prelude::*;
 
@@ -67,7 +66,7 @@ impl Vec3 {
         let z = rng.gen::<f64>() * 2.0 - 1.0; //random value between -1.0 and 1.0
         let r = (1.0 - z * z).sqrt();
 
-        return Vec3::new(r * a.cos(), r * a.sin(), z);
+        Vec3::new(r * a.cos(), r * a.sin(), z)
     }
 
     fn random() -> Self {
@@ -81,7 +80,18 @@ impl Vec3 {
     }
 
     pub fn reflect(&self, normal: &Vec3) -> Self {
-        *self - 2.0 * self.dot(normal) * *normal
+        *self - 2.0 * self.dot(normal) * *normal //&self is a reference to the incident ray, self dot normal scales the normal with the component
+                                                 //of the incident ray in the direction of the normal (since the the normal is a unit vector)
+    }
+
+    pub fn refract(&self, normal: &Vec3, eta_over_etaprime: f64) -> Vec3 {
+        let cos_theta = -self.dot(normal);
+
+        //split the refracted ray into to components, one Parallel to the normal and the other perpendicular
+        let ray_out_parallel = eta_over_etaprime * (*self + cos_theta * *normal);
+        let ray_out_perpendicular = -(1.0 - ray_out_parallel.length_squared()).sqrt() * *normal;
+        //Add them back together to form the refracted ray
+        ray_out_parallel + ray_out_perpendicular
     }
 }
 
@@ -200,8 +210,8 @@ mod tests {
     #[test]
     fn test_vec3_cross() {
         assert_eq!(
-            Vec3::new(1.0, 2.0, 3.0).dot(&Vec3::new(1.0, 5.0, 7.0)),
-            32.0
+            Vec3::new(1.0, 2.0, 3.0).dot(&Vec3::new(1.0, 5.0, 7.0)) as usize,
+            32.0 as usize
         );
     }
 
@@ -233,14 +243,21 @@ mod tests {
 
     #[test]
     fn test_vec3_length() {
-        assert_eq!(Vec3::new(1.0, 2.0, 3.0).length(), 3.7416573867739413);
+        assert_eq!(
+            Vec3::new(1.0, 2.0, 3.0).length() as usize,
+            3.741_657_386_773_941_3 as usize
+        );
     }
 
     #[test]
     fn test_vec3_unit_vector() {
         assert_eq!(
             Vec3::new(1.0, 2.0, 3.0).unit_vector(),
-            Vec3::new(0.2672612419124244, 0.5345224838248488, 0.8017837257372732)
+            Vec3::new(
+                0.267_261_241_912_424_4,
+                0.534_522_483_824_848_8,
+                0.801_783_725_737_273_2
+            )
         );
     }
 }

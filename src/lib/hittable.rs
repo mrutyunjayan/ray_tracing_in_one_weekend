@@ -37,6 +37,10 @@ impl HitRecord {
         self.t
     }
 
+    pub fn front_face(&self) -> bool {
+        self.front_face
+    }
+
     pub fn set_p(&mut self, point: Point3) {
         self.point = point;
     }

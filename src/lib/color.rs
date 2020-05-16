@@ -57,7 +57,7 @@ impl Vec3Traits for Color {
     }
 
     fn unit_vector(&self) -> Self::Kind {
-        *self / self.length_squared()
+        self / self.length_squared()
     }
 }
 
@@ -85,11 +85,11 @@ impl ops::Sub for Color {
     }
 }
 
-impl ops::Div<f64> for Color {
-    type Output = Self;
+impl ops::Div<f64> for &Color {
+    type Output = Color;
 
     fn div(self, rhs: f64) -> Self::Output {
-        Self {
+        Self::Output {
             r: (self.r / rhs),
             g: (self.g / rhs),
             b: (self.b / rhs),
@@ -97,11 +97,11 @@ impl ops::Div<f64> for Color {
     }
 }
 
-impl ops::Mul for Color {
-    type Output = Self;
+impl ops::Mul for &Color {
+    type Output = Color;
 
-    fn mul(self, rhs: Color) -> Self::Output {
-        Self {
+    fn mul(self, rhs: &Color) -> Color {
+        Color {
             r: self.r * rhs.r,
             g: self.g * rhs.g,
             b: self.b * rhs.b,
@@ -109,21 +109,21 @@ impl ops::Mul for Color {
     }
 }
 
-impl ops::Mul<f64> for Color {
-    type Output = Self;
+impl ops::Mul<f64> for &Color {
+    type Output = Color;
 
     fn mul(self, rhs: f64) -> Self::Output {
-        Self {
+        Self::Output {
             r: (self.r * rhs),
             g: (self.g * rhs),
             b: (self.b * rhs),
         }
     }
 }
-impl ops::Mul<Color> for f64 {
+impl ops::Mul<&Color> for f64 {
     type Output = Color;
 
-    fn mul(self, rhs: Color) -> Self::Output {
+    fn mul(self, rhs: &Color) -> Self::Output {
         Color {
             r: (self * rhs.r),
             g: (self * rhs.g),
