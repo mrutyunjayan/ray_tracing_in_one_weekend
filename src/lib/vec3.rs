@@ -59,6 +59,22 @@ impl Vec3 {
         }
     }
 
+    pub fn random_in_unit_disk() -> Vec3 {
+        let mut p: Vec3;
+        let mut rng = rand::thread_rng();
+
+        loop {
+            p = Vec3::new(
+                rng.gen::<f64>() * 2.0 - 1.0,
+                rng.gen::<f64>() * 2.0 - 1.0,
+                0.0,
+            );
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
+    }
+
     pub fn random_unit_vector_lambertian() -> Vec3 {
         let mut rng = rand::thread_rng();
 

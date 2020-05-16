@@ -76,13 +76,20 @@ fn render(aspect_ratio: f64, image_height: usize, samples_per_pixel: usize, max_
     ));
 
     let v_up = Vec3::new(0.0, 1.0, 0.0);
+    let look_from = Point3::new(3.0, 3.0, 2.0);
+    let look_at = Point3::new(0.0, 0.0, -1.0);
+    let focus = (look_from - look_at).length();
+    let aperture = 0.2;
+    let v_fov = 20.0;
 
     let cam = Camera::new(
-        &Point3::new(-2.0, 2.0, 1.0),
-        &Point3::new(0.0, 0.0, -1.0),
+        &look_from,
+        &look_at,
         &v_up,
-        90.0,
+        v_fov,
         aspect_ratio,
+        aperture,
+        focus,
     );
 
     //let cam = Camera::default();
@@ -121,7 +128,7 @@ fn render(aspect_ratio: f64, image_height: usize, samples_per_pixel: usize, max_
 
 fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_HEIGHT: usize = 360;
+    const IMAGE_HEIGHT: usize = 1080;
     const IMAGE_WIDTH: usize = (IMAGE_HEIGHT as f64 * ASPECT_RATIO) as usize;
     const SAMPLE_PER_PIXEL: usize = 100;
     const MAX_DEPTH: u16 = 50;

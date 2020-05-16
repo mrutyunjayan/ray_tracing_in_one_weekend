@@ -1,30 +1,28 @@
 use crate::lib::{ray::*, rt_math::*, vec3::*};
+
+#[allow(dead_code)]
 pub struct Camera {
     origin: Point3,
     horizontal: Vec3,
     vertical: Vec3,
     lower_left_corner: Point3,
+    u: Vec3,
+    v: Vec3,
+    w: Vec3,
+    lens_radius: f64,
 }
 
 impl Camera {
-    #[allow(dead_code)]
-    pub fn default() -> Self {
-        Self {
-            origin: Point3::new(0.0, 0.0, 0.0),
-            horizontal: Vec3::new(4.0, 0.0, 0.0),
-            vertical: Vec3::new(0.0, 2.25, 0.0),
-            lower_left_corner: Point3::new(-2.0, -1.125, -1.0),
-        }
-    }
-
     pub fn new(
         look_from: &Point3,
         look_at: &Point3,
         v_up: &Vec3,
-        vfov: f64, /*vertical field of view, in degrees*/
+        v_fov: f64, /*vertical field of view, in degrees*/
         aspect_ratio: f64,
+        aperture: f64,
+        focus: f64,
     ) -> Self {
-        let theta = degrees_to_radians(vfov);
+        let theta = degrees_to_radians(v_fov);
         let half_height = (theta / 2.0).tan();
         let half_width = aspect_ratio * half_height;
 
@@ -33,22 +31,33 @@ impl Camera {
         let v = w.cross(&u);
 
         let origin = *look_from;
-        let horizontal = 2.0 * half_width * u;
-        let vertical = 2.0 * half_height * v;
-        let lower_left_corner = origin - half_width * u - half_height * v - w;
+        let horizontal = 2.0 * half_width * focus * u;
+        let vertical = 2.0 * half_height * focus * v;
+        let lower_left_corner =
+            origin - half_width * focus * u - half_height * focus * v - focus * w;
+        let lens_radius = aperture / 2.0;
 
         Self {
             origin,
             horizontal,
             vertical,
             lower_left_corner,
+            u,
+            v,
+            w,
+            lens_radius,
         }
     }
 
-    pub fn get_ray(&self, u: f64, v: f64) -> Ray {
+    pub fn get_ray(&self, s: f64, t: f64) -> Ray {
+        let rand_in_disk = self.lens_radius * Vec3::random_in_unit_disk();
+        let offset = self.u * rand_in_disk.x() + self.v * rand_in_disk.y();
+
         Ray::new(
-            &self.origin,
-            &(self.lower_left_corner + (u * self.horizontal) + (v * self.vertical) - self.origin),
+            &(self.origin + offset),
+            &(self.lower_left_corner + (s * self.horizontal) + (t * self.vertical)
+                - self.origin
+                - offset),
         )
     }
 }
