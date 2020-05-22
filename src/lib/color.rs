@@ -1,6 +1,8 @@
 use super::vec3::*;
 use std::ops;
 
+use rand::prelude::*;
+
 #[derive(Copy, Clone, Default)]
 pub struct Color {
     r: f64,
@@ -21,6 +23,16 @@ impl Color {
     }
     pub fn b(&self) -> f64 {
         self.b
+    }
+
+    pub fn random() -> Self {
+        let mut rng = rand::thread_rng();
+
+        Self {
+            r: rng.gen::<f64>(),
+            g: rng.gen::<f64>(),
+            b: rng.gen::<f64>(),
+        }
     }
 
     //Write the tranlated [0,255] value of each color component
