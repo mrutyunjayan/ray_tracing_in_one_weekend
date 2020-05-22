@@ -36,6 +36,7 @@ impl Color {
     }
 
     //Write the tranlated [0,255] value of each color component
+    /*
     pub fn write_color(pixel_color: &Color) {
         println!(
             "{} {} {}\n",
@@ -44,6 +45,7 @@ impl Color {
             (255.99 * pixel_color.b) as usize
         )
     }
+    */
 }
 
 #[allow(dead_code)]
