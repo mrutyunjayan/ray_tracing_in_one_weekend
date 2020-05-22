@@ -1,8 +1,8 @@
 use crate::lib::{hittable::*, ray::Ray};
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct HittableList {
-    objects: Vec<Rc<dyn Hittable>>,
+    objects: Vec<Arc<dyn Hittable>>,
 }
 
 #[allow(dead_code)]
@@ -13,7 +13,7 @@ impl HittableList {
         }
     }
 
-    pub fn add(&mut self, object: Rc<dyn Hittable>) {
+    pub fn add(&mut self, object: Arc<dyn Hittable>) {
         self.objects.push(object);
     }
 

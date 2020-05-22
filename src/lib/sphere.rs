@@ -1,5 +1,5 @@
 use crate::lib::{hittable::*, material::Material, ray::Ray, vec3::*};
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct Sphere {
     center: Point3,
@@ -16,8 +16,8 @@ impl Sphere {
             material,
         }
     }
-    pub fn new_hittable(center: Point3, radius: f64, material: Material) -> Rc<dyn Hittable> {
-        Rc::new(Self {
+    pub fn new_hittable(center: Point3, radius: f64, material: Material) -> Arc<dyn Hittable> {
+        Arc::new(Self {
             center,
             radius,
             material,
