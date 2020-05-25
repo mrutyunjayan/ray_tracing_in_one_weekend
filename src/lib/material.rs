@@ -52,7 +52,7 @@ impl Material {
             //diffuse
             Material::Lambertian { albedo } => {
                 let scatter_direction = hit_rec.normal() + Vec3::random_unit_vector_lambertian();
-                *scattered = Ray::new(&hit_rec.point(), &scatter_direction);
+                *scattered = Ray::new(&hit_rec.point(), &scatter_direction, 0.0);
                 *attenuation = *albedo;
                 true
             }
@@ -64,6 +64,7 @@ impl Material {
                     *scattered = Ray::new(
                         &hit_rec.point(),
                         &(*reflected + Vec3::random_in_unit_sphere()),
+                        0.0,
                     );
                     *attenuation = *albedo;
                     scattered.direction().dot(&hit_rec.normal()) > 0.0
@@ -72,6 +73,7 @@ impl Material {
                     *scattered = Ray::new(
                         &hit_rec.point(),
                         &(*reflected + (*fuzz * Vec3::random_in_unit_sphere())),
+                        0.0,
                     );
                     *attenuation = *albedo;
                     scattered.direction().dot(&hit_rec.normal()) > 0.0
@@ -97,7 +99,7 @@ impl Material {
                 //Must reflect if eta_over_etaprime * sin_theta > 1.0 - Total Internal Reflection
                 if eta_over_etaprime * sin_theta > 1.0 {
                     let reflected = ray_in_unit_direction.reflect(&hit_rec.normal());
-                    *scattered = Ray::new(&hit_rec.point(), &reflected);
+                    *scattered = Ray::new(&hit_rec.point(), &reflected, ray_in.time());
 
                     true
                 } else {
@@ -109,13 +111,13 @@ impl Material {
                     let reflect_probability = Material::schlick(cos_theta, *refractive_index);
                     if rng.gen::<f64>() < reflect_probability {
                         let reflected = ray_in_unit_direction.reflect(&hit_rec.normal());
-                        *scattered = Ray::new(&hit_rec.point(), &reflected);
+                        *scattered = Ray::new(&hit_rec.point(), &reflected, ray_in.time());
 
                         true
                     } else {
                         let refracted =
                             ray_in_unit_direction.refract(&hit_rec.normal(), eta_over_etaprime);
-                        *scattered = Ray::new(&hit_rec.point(), &refracted);
+                        *scattered = Ray::new(&hit_rec.point(), &refracted, ray_in.time());
 
                         true
                     }
