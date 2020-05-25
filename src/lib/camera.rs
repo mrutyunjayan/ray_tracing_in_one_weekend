@@ -1,5 +1,7 @@
 use crate::lib::{ray::*, rt_math::*, vec3::*};
 
+use rand::prelude::*;
+
 #[allow(dead_code)]
 pub struct Camera {
     origin: Point3,
@@ -10,8 +12,11 @@ pub struct Camera {
     v: Vec3,
     w: Vec3,
     lens_radius: f64,
+    time_0: f64, //shutter open time
+    time_1: f64, //shutter close time
 }
 
+#[allow(clippy::too_many_arguments)]
 impl Camera {
     pub fn new(
         look_from: &Point3,
@@ -21,6 +26,8 @@ impl Camera {
         aspect_ratio: f64,
         aperture: f64,
         focus: f64,
+        time_0: f64,
+        time_1: f64,
     ) -> Self {
         let theta = degrees_to_radians(v_fov);
         let half_height = (theta / 2.0).tan();
@@ -46,6 +53,8 @@ impl Camera {
             v,
             w,
             lens_radius,
+            time_0,
+            time_1,
         }
     }
 
@@ -53,11 +62,15 @@ impl Camera {
         let rand_in_disk = self.lens_radius * Vec3::random_in_unit_disk();
         let offset = self.u * rand_in_disk.x() + self.v * rand_in_disk.y();
 
+        let mut rng = rand::thread_rng();
+        let time = rng.gen::<f64>() * (self.time_1 - self.time_0);
+
         Ray::new(
             &(self.origin + offset),
             &(self.lower_left_corner + (s * self.horizontal) + (t * self.vertical)
                 - self.origin
                 - offset),
+            time,
         )
     }
 }

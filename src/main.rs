@@ -89,6 +89,8 @@ fn render(aspect_ratio: f64, image_height: usize, samples_per_pixel: usize, max_
         aspect_ratio,
         aperture,
         focus,
+        0.0,
+        0.1,
     );
 
     //let cam = Camera::default();
@@ -153,10 +155,14 @@ fn make_random_spheres(world: &mut lib::hittable_list::HittableList) {
                 if choose_mat < 0.7 {
                     //diffuse
                     albedo = &Color::random() * &Color::random();
-                    world.add(Sphere::new_hittable(
+                    let center_end = center + Vec3::new(0.0, rng.gen::<f64>() * 0.5 + 1.0, 0.0);
+                    world.add(MoveableSphere::new_hittable(
                         center,
+                        center_end,
                         radius,
                         Material::lambertian(&albedo),
+                        0.0,
+                        1.0,
                     ));
                 } else if choose_mat < 0.90 {
                     albedo = Color::new(rng.gen::<f64>(), 0.5, 1.0);
@@ -180,7 +186,7 @@ fn make_random_spheres(world: &mut lib::hittable_list::HittableList) {
 
 fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_HEIGHT: usize = 360;
+    const IMAGE_HEIGHT: usize = 1080;
     const IMAGE_WIDTH: usize = (IMAGE_HEIGHT as f64 * ASPECT_RATIO) as usize;
     const SAMPLE_PER_PIXEL: usize = 100;
     const MAX_DEPTH: u16 = 50;
