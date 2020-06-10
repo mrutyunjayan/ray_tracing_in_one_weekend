@@ -1,4 +1,4 @@
-use crate::lib::{color::*, material::Material, ray::Ray, vec3::*};
+use crate::lib::{aabb::*, color::*, material::Material, ray::Ray, vec3::*};
 #[derive(Copy, Clone, Default)]
 pub struct HitRecord {
     point: Point3,
@@ -71,6 +71,11 @@ impl HitRecord {
 #[allow(unused_variables)]
 pub trait Hittable: Sync + Send {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, hit_rec: &mut HitRecord) -> bool {
+        false
+    }
+
+    fn bounding_box(&self, t_0: f64, t_1: f64, output_box: &mut AABB) -> bool // return bool because not all primitives have bounding boxes eg. infinite planes
+    {
         false
     }
 }
