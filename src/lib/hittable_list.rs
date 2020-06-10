@@ -1,4 +1,4 @@
-use crate::lib::{hittable::*, ray::Ray};
+use crate::lib::{aabb::*, hittable::*, ray::Ray};
 use std::sync::Arc;
 
 pub struct HittableList {
@@ -19,6 +19,36 @@ impl HittableList {
 
     pub fn clear(&mut self) {
         self.objects.clear();
+    }
+
+    pub fn bounding_box(&self, t_0: f64, t_1: f64, output_box: &mut AABB) -> bool {
+        if self.objects.is_empty() {
+            return false;
+        }
+
+        let mut first_box = true;
+        let mut temp_box = AABB::default();
+
+        //iterate through all the boxues, expanding the "running box" to enclose each new one. In the end you have something
+        //that surrounds all of them
+        for object in &self.objects {
+            //fill in temp_box with what is the bounding box of "object", and if this is impossible, return false
+            if !object.bounding_box(t_0, t_1, &mut temp_box) {
+                return false;
+            }
+
+            //if it is the first iteration, make the box of the whole list so far temp_box (which we just computed)
+            *output_box = if first_box {
+                temp_box
+
+            //otherwise call surrdounding box and assign the result to the output box
+            } else {
+                AABB::surrounding_box(output_box, &temp_box)
+            };
+            first_box = false;
+        }
+
+        true
     }
 }
 

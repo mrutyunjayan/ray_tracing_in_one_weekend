@@ -1,4 +1,4 @@
-use crate::lib::{hittable::*, material::Material, ray::Ray, vec3::*};
+use crate::lib::{aabb::*, hittable::*, material::Material, ray::Ray, vec3::*};
 use std::sync::Arc;
 
 pub struct Sphere {
@@ -73,6 +73,14 @@ impl Hittable for Sphere {
         }
         false
     }
+
+    fn bounding_box(&self, _t_0: f64, _t_1: f64, output_box: &mut AABB) -> bool {
+        *output_box = AABB::new(
+            &(self.center - Vec3::new(self.radius, self.radius, self.radius)),
+            &(self.center + Vec3::new(self.radius, self.radius, self.radius)),
+        );
+        true
+    }
 }
 
 impl MoveableSphere {
@@ -140,5 +148,23 @@ impl Hittable for MoveableSphere {
             }
         }
         false
+    }
+
+    fn bounding_box(&self, t_0: f64, t_1: f64, output_box: &mut AABB) -> bool {
+        let (box_0, box_1): (AABB, AABB);
+
+        box_0 = AABB::new(
+            &(self.center(t_0) - Vec3::new(self.radius, self.radius, self.radius)),
+            &(self.center(t_0) + Vec3::new(self.radius, self.radius, self.radius)),
+        );
+
+        box_1 = AABB::new(
+            &(self.center(t_1) - Vec3::new(self.radius, self.radius, self.radius)),
+            &(self.center(t_1) + Vec3::new(self.radius, self.radius, self.radius)),
+        );
+
+        *output_box = AABB::surrounding_box(&box_0, &box_1);
+
+        true
     }
 }

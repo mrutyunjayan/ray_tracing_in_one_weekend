@@ -5,7 +5,7 @@ use rand::prelude::*;
 
 pub type Point3 = Vec3;
 
-#[derive(Copy, Clone, Debug, PartialEq, Default)]
+#[derive(Copy, Clone, Debug, PartialEq, Default, PartialOrd)]
 pub struct Vec3 {
     x: f64,
     y: f64,
@@ -207,6 +207,18 @@ impl ops::Neg for Vec3 {
             x: -self.x,
             y: -self.y,
             z: -self.z,
+        }
+    }
+}
+
+impl ops::Div<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn div(self, rhs: Vec3) -> Self::Output {
+        Vec3 {
+            x: (self / rhs.x),
+            y: (self / rhs.y),
+            z: (self / rhs.z),
         }
     }
 }
